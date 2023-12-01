@@ -1,65 +1,18 @@
 fun main() {
     // test if implementation meets criteria from the description, like:
     val exampleInput1 = readInput("Day1/Day01_1")
-    val result1 = Day01().part1(exampleInput1)
+    val result1 = Day01(exampleInput1).part1()
     println(result1)
 
     val exampleInput2 = readInput("Day1/Day01_2")
-    val result2 = Day01().part2(exampleInput2)
+    val result2 = Day01(exampleInput2).part2()
     println(result2)
 }
 
-class Day01 {
+class Day01(private val input: List<String>) {
 
-
-    fun part1(input: List<String>): Int {
-        var sum = 0
-        input.forEach {
-            val number: String = it.filter { it.isDigit() }
-            sum += number.first().digitToInt() * 10 + number.last().digitToInt()
-        }
-        return sum
-    }
-
-
-    fun part2(input: List<String>): Int {
-        var sum = 0
-        input.forEach {
-            val first = getElement(it)
-            val last = getElementReversed(it.reversed())
-            sum += first *10 + last
-        }
-        return sum
-    }
-
-
-    fun getElement(input: String): Int {
-        var indexOfFirst = 99999
-        var valueOfFirst = -1
-        validSequence.forEach {
-            val r: Int = input.indexOf(it.key, 0, true)
-            if (r != -1 && r < indexOfFirst) {
-                indexOfFirst = r
-                valueOfFirst = it.value
-            }
-        }
-        return valueOfFirst
-    }
-    fun getElementReversed(input: String): Int {
-        var indexOfFirst = 99999
-        var valueOfFirst = -1
-        validSequence.forEach {
-            val r: Int = input.indexOf(it.key.reversed(), 0, true)
-            if (r != -1 && r < indexOfFirst) {
-                indexOfFirst = r
-                valueOfFirst = it.value
-            }
-        }
-        return valueOfFirst
-    }
-
-
-    val validSequence: Map<String, Int> = mapOf(
+    // maps with words and numbers
+    private val numbersInWords: Map<String, Int> = mapOf(
         "one" to 1,
         "two" to 2,
         "three" to 3,
@@ -80,4 +33,24 @@ class Day01 {
         "9" to 9,
         "0" to 0
     )
+    private val reversedNumbersInWords: Map<String, Int> = numbersInWords.map { it.key.reversed() to it.value }.toMap()
+
+    fun part1(): Int = input.sumOf {
+        val numbers: String = it.filter { it.isDigit() }
+        // row total
+        numbers.first().digitToInt() * 10 + numbers.last().digitToInt()
+    }
+
+    fun part2(): Int = input.sumOf {
+        val first = getDigit(it, numbersInWords)
+        val last = getDigit(it.reversed(), reversedNumbersInWords)
+        // row total
+        first * 10 + last
+    }
+
+    // find the 1st occurrence of a number/word in our row
+    private fun getDigit(row: String, map: Map<String, Int>): Int {
+        val result: Pair<Int, String> = row.findAnyOf(map.keys)!!
+        return map[result.second]!!
+    }
 }
